@@ -42,10 +42,22 @@ class MoodFlickApp extends StatelessWidget {
         brightness: Brightness.light,
         scaffoldBackgroundColor: const Color(0xFFF8F8FA),
         primaryColor: const Color(0xFFE92D35),
-        textTheme: GoogleFonts.poppinsTextTheme(),
+        textTheme: GoogleFonts.notoSansTextTheme(),
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFFE92D35),
           brightness: Brightness.light,
+        ),
+        navigationBarTheme: NavigationBarThemeData(
+          height: 76,
+          elevation: 0,
+          backgroundColor: const Color(0xFFFFECEC),
+          indicatorColor: const Color(0xFFE92D35).withOpacity(0.16),
+          labelTextStyle: WidgetStateProperty.all(
+            const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
         ),
       ),
       darkTheme: ThemeData(
@@ -53,12 +65,24 @@ class MoodFlickApp extends StatelessWidget {
         brightness: Brightness.dark,
         scaffoldBackgroundColor: const Color(0xFF0F0F14),
         primaryColor: const Color(0xFFE92D35),
-        textTheme: GoogleFonts.poppinsTextTheme(
+        textTheme: GoogleFonts.notoSansTextTheme(
           ThemeData.dark().textTheme,
         ),
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFFE92D35),
           brightness: Brightness.dark,
+        ),
+        navigationBarTheme: NavigationBarThemeData(
+          height: 76,
+          elevation: 0,
+          backgroundColor: const Color(0xFF17171F),
+          indicatorColor: const Color(0xFFE92D35).withOpacity(0.18),
+          labelTextStyle: WidgetStateProperty.all(
+            const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
         ),
       ),
       home: const StartGate(),
