@@ -68,22 +68,25 @@ class MovieCardSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDesktop = MediaQuery.of(context).size.width >= 900;
+    final cardWidth = isDesktop ? 130.0 : 112.0;
+
     return SizedBox(
-      width: 130,
-      child: Column(
+      width: cardWidth,
+      child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
+        children: [
           Expanded(
             child: SkeletonBox(
-              width: 130,
+              width: double.infinity,
               height: double.infinity,
               radius: 18,
             ),
           ),
           SizedBox(height: 8),
-          SkeletonBox(width: 110, height: 12, radius: 8),
+          SkeletonBox(width: 90, height: 12, radius: 8),
           SizedBox(height: 6),
-          SkeletonBox(width: 60, height: 10, radius: 8),
+          SkeletonBox(width: 55, height: 10, radius: 8),
         ],
       ),
     );
@@ -95,30 +98,32 @@ class MovieGridSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDesktop = MediaQuery.of(context).size.width >= 900;
+
     return GridView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: 8,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: 0.62,
-        mainAxisSpacing: 16,
-        crossAxisSpacing: 14,
+      padding: const EdgeInsets.only(bottom: 90),
+      itemCount: 12,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: isDesktop ? 8 : 3,
+        mainAxisExtent: isDesktop ? 205 : 185,
+        crossAxisSpacing: isDesktop ? 12 : 10,
+        mainAxisSpacing: isDesktop ? 18 : 14,
       ),
       itemBuilder: (context, index) {
-        return Column(
+        return const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
+          children: [
             Expanded(
               child: SkeletonBox(
                 width: double.infinity,
                 height: double.infinity,
-                radius: 18,
+                radius: 14,
               ),
             ),
             SizedBox(height: 8),
-            SkeletonBox(width: 120, height: 12, radius: 8),
-            SizedBox(height: 6),
-            SkeletonBox(width: 70, height: 10, radius: 8),
+            SkeletonBox(width: 80, height: 11, radius: 8),
+            SizedBox(height: 5),
+            SkeletonBox(width: 45, height: 9, radius: 8),
           ],
         );
       },

@@ -39,7 +39,7 @@ class MoodFlickApp extends StatelessWidget {
         brightness: Brightness.light,
         scaffoldBackgroundColor: const Color(0xFFF5F5F7),
         primaryColor: const Color(0xFFE92D35),
-        textTheme: GoogleFonts.poppinsTextTheme(),
+        textTheme: GoogleFonts.notoSansTextTheme(),
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFFE92D35),
           brightness: Brightness.light,
@@ -49,7 +49,7 @@ class MoodFlickApp extends StatelessWidget {
         brightness: Brightness.dark,
         scaffoldBackgroundColor: const Color(0xFF0F0F14),
         primaryColor: const Color(0xFFE92D35),
-        textTheme: GoogleFonts.poppinsTextTheme(
+        textTheme: GoogleFonts.notoSansTextTheme(
           ThemeData.dark().textTheme,
         ),
         colorScheme: ColorScheme.fromSeed(

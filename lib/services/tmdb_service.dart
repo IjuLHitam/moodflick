@@ -25,7 +25,7 @@ class TmdbService {
     }
 
     final data = jsonDecode(response.body);
-    final results = data['results'] as List;
+    final results = data['results'] as List? ?? [];
 
     return results.map((item) => Movie.fromJson(item)).toList();
   }
@@ -44,6 +44,10 @@ class TmdbService {
 
   Future<List<Movie>> topRated() {
     return _fetchList('/movie/top_rated');
+  }
+
+  Future<List<Movie>> upcoming() {
+    return _fetchList('/movie/upcoming');
   }
 
   Future<List<Movie>> search(String query, {int page = 1}) {
@@ -70,43 +74,42 @@ class TmdbService {
   }
 
   Future<Map<String, dynamic>> detail(int movieId) async {
-  Future<Map<String, dynamic>> fetchDetail(String language) async {
-    final uri = Uri.parse('${AppConfig.tmdbBaseUrl}/movie/$movieId').replace(
-      queryParameters: {
-        'api_key': AppConfig.tmdbApiKey,
-        'language': language,
-        'append_to_response': 'videos,credits,recommendations',
-      },
-    );
+    Future<Map<String, dynamic>> fetchDetail(String language) async {
+      final uri = Uri.parse('${AppConfig.tmdbBaseUrl}/movie/$movieId').replace(
+        queryParameters: {
+          'api_key': AppConfig.tmdbApiKey,
+          'language': language,
+          'append_to_response': 'videos,credits,recommendations',
+        },
+      );
 
-    final response = await http.get(uri);
+      final response = await http.get(uri);
 
-    if (response.statusCode != 200) {
-      throw Exception('Gagal mengambil detail film');
+      if (response.statusCode != 200) {
+        throw Exception('Gagal mengambil detail film');
+      }
+
+      return jsonDecode(response.body);
     }
 
-    return jsonDecode(response.body);
+    final indonesiaDetail = await fetchDetail('id-ID');
+    final overview = indonesiaDetail['overview'];
+
+    if (overview != null && overview.toString().trim().isNotEmpty) {
+      return indonesiaDetail;
+    }
+
+    final englishDetail = await fetchDetail('en-US');
+
+    return {
+      ...englishDetail,
+      'genres': indonesiaDetail['genres'] ?? englishDetail['genres'],
+      'credits': indonesiaDetail['credits'] ?? englishDetail['credits'],
+      'recommendations':
+          indonesiaDetail['recommendations'] ?? englishDetail['recommendations'],
+      'videos': indonesiaDetail['videos'] ?? englishDetail['videos'],
+    };
   }
-
-  final indonesiaDetail = await fetchDetail('id-ID');
-
-  final overview = indonesiaDetail['overview'];
-
-  if (overview != null && overview.toString().trim().isNotEmpty) {
-    return indonesiaDetail;
-  }
-
-  final englishDetail = await fetchDetail('en-US');
-
-  return {
-    ...englishDetail,
-    'genres': indonesiaDetail['genres'] ?? englishDetail['genres'],
-    'credits': indonesiaDetail['credits'] ?? englishDetail['credits'],
-    'recommendations':
-        indonesiaDetail['recommendations'] ?? englishDetail['recommendations'],
-    'videos': indonesiaDetail['videos'] ?? englishDetail['videos'],
-  };
-}
 
   Future<String?> getTrailerKey(int movieId) async {
     Future<String?> fetchTrailer(String language) async {
@@ -127,9 +130,7 @@ class TmdbService {
       final data = jsonDecode(response.body);
       final results = data['results'] as List? ?? [];
 
-      if (results.isEmpty) {
-        return null;
-      }
+      if (results.isEmpty) return null;
 
       final youtubeVideos = results
           .where(
@@ -139,9 +140,7 @@ class TmdbService {
           )
           .toList();
 
-      if (youtubeVideos.isEmpty) {
-        return null;
-      }
+      if (youtubeVideos.isEmpty) return null;
 
       final trailers = youtubeVideos
           .where((video) => video['type'] == 'Trailer')
@@ -155,16 +154,10 @@ class TmdbService {
     }
 
     final indonesiaTrailer = await fetchTrailer('id-ID');
-
-    if (indonesiaTrailer != null) {
-      return indonesiaTrailer;
-    }
+    if (indonesiaTrailer != null) return indonesiaTrailer;
 
     final englishTrailer = await fetchTrailer('en-US');
-
-    if (englishTrailer != null) {
-      return englishTrailer;
-    }
+    if (englishTrailer != null) return englishTrailer;
 
     return null;
   }

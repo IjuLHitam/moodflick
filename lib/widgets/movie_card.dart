@@ -16,33 +16,36 @@ class MovieCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDesktop = MediaQuery.of(context).size.width >= 900;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     final posterUrl = movie.posterPath.isEmpty
         ? null
         : '${AppConfig.imageBaseUrl}${movie.posterPath}';
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return GestureDetector(
       onTap: onTap,
       child: SizedBox(
-        width: 130,
+        width: isDesktop ? 130 : 112,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(22),
+                  borderRadius: BorderRadius.circular(18),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.12),
-                      blurRadius: 18,
-                      offset: const Offset(0, 10),
+                      color: Colors.black.withValues(
+                        alpha: isDark ? 0.30 : 0.10,
+                      ),
+                      blurRadius: 14,
+                      offset: const Offset(0, 8),
                     ),
                   ],
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(22),
+                  borderRadius: BorderRadius.circular(18),
                   child: Stack(
                     children: [
                       Positioned.fill(
@@ -66,44 +69,48 @@ class MovieCard extends StatelessWidget {
                               end: Alignment.bottomCenter,
                               colors: [
                                 Colors.transparent,
-                                Colors.black.withValues(alpha: 0.65),
+                                Colors.black.withValues(alpha: 0.45),
                               ],
                             ),
                           ),
                         ),
                       ),
                       Positioned(
-                        top: 8,
-                        left: 8,
+                        top: 7,
+                        left: 7,
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
+                            horizontal: 7,
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.60),
+                            color: Colors.black.withValues(alpha: 0.72),
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.25),
+                          ),
+                          child: Text(
+                            '★ ${movie.rating.toStringAsFixed(1)}',
+                            style: const TextStyle(
+                              color: Colors.greenAccent,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
                             ),
                           ),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.star,
-                                color: Colors.greenAccent,
-                                size: 12,
-                              ),
-                              const SizedBox(width: 3),
-                              Text(
-                                movie.rating.toStringAsFixed(1),
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
+                        ),
+                      ),
+                      Positioned(
+                        top: 7,
+                        right: 7,
+                        child: Container(
+                          width: 26,
+                          height: 26,
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.45),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.bookmark_border_rounded,
+                            color: Colors.white,
+                            size: 15,
                           ),
                         ),
                       ),
@@ -117,18 +124,19 @@ class MovieCard extends StatelessWidget {
               movie.title,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 12,
+              style: TextStyle(
+                fontWeight: FontWeight.w800,
+                fontSize: isDesktop ? 12 : 11,
               ),
             ),
+            const SizedBox(height: 3),
             Text(
               movie.releaseDate.isEmpty
                   ? '-'
                   : movie.releaseDate.split('-').first,
               style: TextStyle(
-                fontSize: 11,
-                color: Colors.grey.shade600,
+                fontSize: isDesktop ? 11 : 10,
+                color: Colors.grey,
               ),
             ),
           ],
