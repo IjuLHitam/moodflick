@@ -7,6 +7,7 @@ import '../models/movie.dart';
 import '../services/tmdb_service.dart';
 import '../utils/page_transition.dart';
 import '../widgets/app_background.dart';
+import '../widgets/mood_card.dart';
 import '../widgets/movie_card.dart';
 import '../widgets/skeleton_loader.dart';
 import 'detail_screen.dart';
@@ -27,48 +28,66 @@ class _HomeScreenState extends State<HomeScreen> {
   late Future<List<Movie>> nowPlaying;
   late Future<List<Movie>> topRated;
 
-  final moods = const [
+  final moods = const <Map<String, Object>>[
     {
-      'name': 'Senang',
-      'emoji': '😄',
-      'subtitle': 'Film lucu & menghibur',
-      'color1': Color(0xFFFFC857),
-      'color2': Color(0xFFFF8C42),
+      'key': 'senang',
+      'title': 'Happy',
+      'subtitle': 'Joy & Laughter',
+      'icon': Icons.wb_sunny_outlined,
+      'light1': Color(0xFFF6B73C),
+      'light2': Color(0xFFE3942D),
+      'dark1': Color(0xFF2D2417),
+      'dark2': Color(0xFF0F1117),
     },
     {
-      'name': 'Sedih',
-      'emoji': '😔',
-      'subtitle': 'Drama penuh emosi',
-      'color1': Color(0xFF74B9FF),
-      'color2': Color(0xFF6C5CE7),
+      'key': 'sedih',
+      'title': 'Sad',
+      'subtitle': 'Melancholic',
+      'icon': Icons.nightlight_round,
+      'light1': Color(0xFF5B8CFF),
+      'light2': Color(0xFF345EE8),
+      'dark1': Color(0xFF0E2948),
+      'dark2': Color(0xFF0F182B),
     },
     {
-      'name': 'Marah',
-      'emoji': '😡',
-      'subtitle': 'Aksi penuh adrenalin',
-      'color1': Color(0xFFFF5E5E),
-      'color2': Color(0xFFB80000),
+      'key': 'marah',
+      'title': 'Angry',
+      'subtitle': 'Intense & Raw',
+      'icon': Icons.local_fire_department_outlined,
+      'light1': Color(0xFFEA7A98),
+      'light2': Color(0xFFD85B78),
+      'dark1': Color(0xFF2A0E18),
+      'dark2': Color(0xFF151017),
     },
     {
-      'name': 'Santai',
-      'emoji': '😌',
-      'subtitle': 'Dokumenter & musik',
-      'color1': Color(0xFF6BCB77),
-      'color2': Color(0xFF2D9C75),
+      'key': 'santai',
+      'title': 'Relaxed',
+      'subtitle': 'Calm & Easy',
+      'icon': Icons.spa_outlined,
+      'light1': Color(0xFF66D0D3),
+      'light2': Color(0xFF34A8B8),
+      'dark1': Color(0xFF0E2A2D),
+      'dark2': Color(0xFF0A1A21),
     },
     {
-      'name': 'Semangat',
-      'emoji': '😆',
-      'subtitle': 'Petualangan epik',
-      'color1': Color(0xFFFFB347),
-      'color2': Color(0xFFFF4D00),
+      'key': 'semangat',
+      'title': 'Motivated',
+      'subtitle': 'Fired Up',
+      'icon': Icons.bolt_outlined,
+      'light1': Color(0xFFFFA85F),
+      'light2': Color(0xFFEF7F3B),
+      'dark1': Color(0xFF2A160D),
+      'dark2': Color(0xFF141114),
     },
     {
-      'name': 'Lelah',
-      'emoji': '🥱',
-      'subtitle': 'Ringan & menyenangkan',
-      'color1': Color(0xFFB56CFF),
-      'color2': Color(0xFF6C5CE7),
+      'key': 'lelah',
+      'title': 'Tired',
+      'subtitle': 'Need Rest',
+      'icon': Icons.dark_mode_outlined,
+      'light1': Color(0xFFA78BFA),
+      'light2': Color(0xFF7C67D9),
+      'dark1': Color(0xFF231A38),
+      'dark2': Color(0xFF141423),
     },
   ];
 
@@ -103,9 +122,128 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget moodCard(
+    Map<String, Object> mood, {
+    bool tall = false,
+  }) {
+    return MoodCard(
+      title: mood['title'] as String,
+      subtitle: mood['subtitle'] as String,
+      icon: mood['icon'] as IconData,
+      lightColor1: mood['light1'] as Color,
+      lightColor2: mood['light2'] as Color,
+      darkColor1: mood['dark1'] as Color,
+      darkColor2: mood['dark2'] as Color,
+      compact: true,
+      tall: tall,
+      onTap: () => openMood(mood['key'] as String),
+    );
+  }
+
+  Widget buildMoodSection() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final useMosaic = constraints.maxWidth >= 720;
+
+        if (!useMosaic) {
+          return GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: moods.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              mainAxisExtent: 120,
+            ),
+            itemBuilder: (context, index) {
+              return moodCard(moods[index]);
+            },
+          );
+        }
+
+        final sectionWidth =
+            constraints.maxWidth > 620 ? 620.0 : constraints.maxWidth;
+
+        const gap = 12.0;
+
+        final leftW = (sectionWidth - gap) * 0.66;
+        final rightW = sectionWidth - leftW - gap;
+
+        const topH = 78.0;
+        const midH = 70.0;
+        const bottomH = 68.0;
+
+        const sectionH = topH + gap + midH + gap + bottomH;
+
+        final happy = moods[0];
+        final sad = moods[1];
+        final angry = moods[2];
+        final relaxed = moods[3];
+        final motivated = moods[4];
+        final tired = moods[5];
+
+        return Align(
+          alignment: Alignment.centerLeft,
+          child: SizedBox(
+            width: sectionWidth,
+            height: sectionH,
+            child: Stack(
+              children: [
+                Positioned(
+                  left: 0,
+                  top: 0,
+                  width: leftW,
+                  height: topH,
+                  child: moodCard(happy),
+                ),
+                Positioned(
+                  left: leftW + gap,
+                  top: 0,
+                  width: rightW,
+                  height: topH + gap + midH,
+                  child: moodCard(sad, tall: true),
+                ),
+                Positioned(
+                  left: 0,
+                  top: topH + gap,
+                  width: (leftW - gap) / 2,
+                  height: midH,
+                  child: moodCard(angry),
+                ),
+                Positioned(
+                  left: ((leftW - gap) / 2) + gap,
+                  top: topH + gap,
+                  width: (leftW - gap) / 2,
+                  height: midH,
+                  child: moodCard(relaxed),
+                ),
+                Positioned(
+                  left: 0,
+                  top: topH + gap + midH + gap,
+                  width: leftW,
+                  height: bottomH,
+                  child: moodCard(motivated),
+                ),
+                Positioned(
+                  left: leftW + gap,
+                  top: topH + gap + midH + gap,
+                  width: rightW,
+                  height: bottomH,
+                  child: moodCard(tired),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = Supabase.instance.client.auth.currentUser;
+
     final name = user?.userMetadata?['username'] ??
         user?.email?.split('@').first ??
         'guest';
@@ -160,7 +298,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           decoration: BoxDecoration(
                             color:
                                 Theme.of(context).brightness == Brightness.dark
-                                    ? Colors.white.withValues(alpha: 0.08)
+                                    ? Colors.white.withOpacity(0.08)
                                     : Colors.white,
                             shape: BoxShape.circle,
                           ),
@@ -173,7 +311,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           decoration: BoxDecoration(
                             color:
                                 Theme.of(context).brightness == Brightness.dark
-                                    ? Colors.white.withValues(alpha: 0.08)
+                                    ? Colors.white.withOpacity(0.08)
                                     : Colors.white,
                             shape: BoxShape.circle,
                           ),
@@ -199,88 +337,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         fontSize: 13,
                       ),
                     ),
-
                     const SizedBox(height: 16),
 
-                    GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: moods.length,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: isDesktop ? 6 : 3,
-                        mainAxisSpacing: isDesktop ? 12 : 10,
-                        crossAxisSpacing: isDesktop ? 12 : 10,
-                        childAspectRatio: isDesktop ? 1.15 : 0.95,
-                      ),
-                      itemBuilder: (context, index) {
-                        final mood = moods[index];
-
-                        return InkWell(
-                          onTap: () => openMood(mood['name'] as String),
-                          borderRadius: BorderRadius.circular(18),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(18),
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  mood['color1'] as Color,
-                                  mood['color2'] as Color,
-                                ],
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: (mood['color2'] as Color)
-                                      .withValues(alpha: 0.22),
-                                  blurRadius: 18,
-                                  offset: const Offset(0, 8),
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  mood['emoji'] as String,
-                                  style: TextStyle(
-                                    fontSize: isDesktop ? 30 : 26,
-                                  ),
-                                ),
-                                const SizedBox(height: 7),
-                                Text(
-                                  mood['name'] as String,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w900,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 4),
-                                  child: Text(
-                                    mood['subtitle'] as String,
-                                    textAlign: TextAlign.center,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: isDesktop ? 10 : 8,
-                                      fontWeight: FontWeight.w700,
-                                      height: 1.1,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+                    buildMoodSection(),
 
                     const SizedBox(height: 28),
-                    Divider(color: Colors.grey.withValues(alpha: 0.18)),
+                    Divider(color: Colors.grey.withOpacity(0.18)),
                     const SizedBox(height: 20),
 
                     const Text(
@@ -290,7 +352,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         fontWeight: FontWeight.w900,
                       ),
                     ),
-
                     const SizedBox(height: 14),
 
                     FutureBuilder<List<Movie>>(
@@ -333,8 +394,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                           begin: Alignment.centerLeft,
                                           end: Alignment.centerRight,
                                           colors: [
-                                            Colors.black.withValues(alpha: 0.88),
-                                            Colors.black.withValues(alpha: 0.28),
+                                            Colors.black.withOpacity(0.88),
+                                            Colors.black.withOpacity(0.28),
                                           ],
                                         ),
                                       ),
